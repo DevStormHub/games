@@ -1173,3 +1173,225 @@
 			*/
 
 			// ⬅️⬆️➡️ تعريف أزرار التحكم
+
+			const arrows = { left: false, up: false, right: false };
+
+            
+
+            // ⌨️ دعم لوحة المفاتيح
+
+            function trackKeysFromKeyboard() {
+
+              const keyCodes = { 37: 'left', 38: 'up', 39: 'right' };
+
+              function handler(event) {
+
+                if (keyCodes.hasOwnProperty(event.keyCode)) {
+
+                  let down = event.type === 'keydown';
+
+                  arrows[keyCodes[event.keyCode]] = down;
+
+                  event.preventDefault();
+
+                }
+
+              }
+
+              addEventListener('keydown', handler);
+
+              addEventListener('keyup', handler);
+
+            }
+
+            
+
+            // 📱 دعم أزرار الجوال
+
+            function bindMobileControls() {
+
+              const leftBtn = document.getElementById('left-btn');
+
+              const rightBtn = document.getElementById('right-btn');
+
+              const upBtn = document.getElementById('up-btn');
+
+            
+
+              const setKey = (key, value) => arrows[key] = value;
+
+            
+
+              const setupButton = (btn, key) => {
+
+                btn.addEventListener('touchstart', () => setKey(key, true));
+
+                btn.addEventListener('touchend', () => setKey(key, false));
+
+                btn.addEventListener('mousedown', () => setKey(key, true));
+
+                btn.addEventListener('mouseup', () => setKey(key, false));
+
+                btn.addEventListener('mouseleave', () => setKey(key, false));
+
+              };
+
+            
+
+              setupButton(leftBtn, 'left');
+
+              setupButton(rightBtn, 'right');
+
+              setupButton(upBtn, 'up');
+
+            }
+
+            
+
+            // ▶️ إدارة إطار التحديث
+
+            function runAnimation(frameFunc) {
+
+              let lastTime = null;
+
+              function frame(time) {
+
+                if (lastTime !== null) {
+
+                  let timeStep = Math.min(time - lastTime, 100) / 1000;
+
+                  if (frameFunc(timeStep) === false) return;
+
+                }
+
+                lastTime = time;
+
+                requestAnimationFrame(frame);
+
+              }
+
+              requestAnimationFrame(frame);
+
+            }
+
+            
+
+            // 🧩 تشغيل مستوى معين
+
+            function runLevel(level, Display, andThen) {
+
+              let display = new Display(document.body, level);
+
+              runAnimation(function (step) {
+
+                level.animate(step, arrows);
+
+                display.drawFrame(step);
+
+                if (level.isFinished()) {
+
+                  display.clear();
+
+                  if (andThen) andThen(level.status);
+
+                  return false;
+
+                }
+
+              });
+
+            }
+
+            
+
+            // 🎮 تشغيل جميع المستويات
+
+            function runGame(plans, Display) {
+
+              function startLevel(n) {
+
+                runLevel(new Level(plans[n]), Display, function (status) {
+
+                  if (status === 'lost') startLevel(n);
+
+                  else if (n < plans.length - 1) startLevel(n + 1);
+
+                  else alert('مبروك ديونه 🥳🎉 فزتي عيني 😂 انتظري لعبه أخرى بعد فتره');
+
+                });
+
+              }
+
+              startLevel(0);
+
+            }
+
+            
+
+            // 🚀 بدء اللعبة
+
+            trackKeysFromKeyboard();
+
+            bindMobileControls();
+
+            runGame(LEVELS, DOMDisplay);
+
+		</script>
+
+       <!-- <script>
+
+              const arrows = trackKeys({ 37: 'left', 38: 'up', 39: 'right' });
+
+            
+
+              function bindMobileControls() {
+
+                const leftBtn = document.getElementById('left-btn');
+
+                const rightBtn = document.getElementById('right-btn');
+
+                const upBtn = document.getElementById('up-btn');
+
+            
+
+                const setKey = (key, value) => {
+
+                  arrows[key] = value;
+
+                };
+
+            
+
+                const setupButton = (btn, key) => {
+
+                  btn.addEventListener('touchstart', () => setKey(key, true));
+
+                  btn.addEventListener('touchend', () => setKey(key, false));
+
+                  btn.addEventListener('mousedown', () => setKey(key, true));
+
+                  btn.addEventListener('mouseup', () => setKey(key, false));
+
+                  btn.addEventListener('mouseleave', () => setKey(key, false));
+
+                };
+
+
+
+            setupButton(leftBtn, 'left');
+
+            setupButton(rightBtn, 'right');
+
+            setupButton(upBtn, 'up');
+
+              }
+
+
+
+              bindMobileControls();
+
+        </script> -->
+
+	</body>
+
+</html>
